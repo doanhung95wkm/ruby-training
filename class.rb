@@ -11,6 +11,7 @@ class Box
    def getArea
       getWidth() * getHeight
 	self.printArea
+  puts self.send('getWidth')
    end
 
    # define private accessor methods
@@ -39,4 +40,3 @@ box = Box.new(10, 20)
 box.getArea()
 
 # try to call protected or methods
-

@@ -1,4 +1,4 @@
-
+#!/usr/bin/ruby
 
 def promptAndGet(prompt)
    print prompt
