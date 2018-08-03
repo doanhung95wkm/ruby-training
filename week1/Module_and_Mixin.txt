@@ -1,0 +1,52 @@
+Module and Mixin
+
+  A module is a group of constant, class, method. The objective of a module is sharing the ressource that many class could use.
+  A simple definition of a module: 
+    module Doan
+      EN = 1
+      def Doan.first_method
+        puts "This is first method in module"
+      end 
+    end   
+  A module can be implemented in a class:
+    class Hung
+      include Doan 
+      def method_1
+        puts Doan::EN 
+      end 
+    end
+    p=Hung.new
+    p.method_1
+    p.first_method 
+    => 1
+       "This is first method in module"
+  Because Ruby doesn't support multiple inheritance, we have another way for implement other method.
+  So for the situation that many classes want to share a same method, we can define a module with the method and in the class, we can use the method just by including that module.
+  We can also include as many module as we want for using the method inside those modules.
+
+  module A
+     def a
+      "method a1 from A"
+     end
+  end
+  module B
+     def b1
+      "method b1 from B"
+     end
+  end
+
+  class Sample
+  include A
+  include B
+     def s1
+      "method s1 from Sample"
+     end
+  end     
+        
+  a=Sample.new
+  a.s1
+  a.a 
+  a.b   
+  => "method s1 from Sample"
+  => "method s1 from Sample"
+  => "method s1 from Sample"

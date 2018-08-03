@@ -1,0 +1,67 @@
+- 2 spaces for indent
+- spaces around operator except for:
+  **, /, &.
+  &. is safe operator navigation
+- no spaces after (, [ or before ),]. But spaces for { }
+- no spaces for #{} and range literals (i.e "a".."z", 1..9)
+- indent when assigning a conditional expression to a variable:
+  result =
+    if some_cond
+      calc_something
+    else
+      calc_something_else
+    end
+  - 1 empty lines between 2 methods
+  - 1 empty lines after access modifiers
+  class Foo
+    attr_reader :foo
+
+    def foo
+      # do something...
+    end
+  end
+- No () with empty arguments methods
+- Avoid assigning arguments too long
+  def send_mail(source)
+    Mailer.deliver(
+      to: 'bob@example.com',
+      from: 'us@example.com',
+      subject: 'Important message',
+      body: source.text
+    )
+  end
+- Add underscores to large numeric literals to improve their readability
+  num = 1_000_000
+- Always use () to wrap params
+  temperance = Person.new('Temperance', 30)
+- Optional arguments place in the last.
+  def some_method(c, d, a = 1, b = 2)
+    puts "#{a}, #{b}, #{c}, #{d}"
+  end
+- Ternary expression is preferred:
+  result = some_condition ? something : something_else
+  than:
+  result = if some_condition then something else something_else end
+- use && and || to express boolean expression 'and', 'or'
+- No use "unless" with "else"
+- {...} for 1 line block, do...end for many lines block
+- Name the variable in English
+- Name method in snake case for symbols, methods, variables
+  some_var = 5
+  var10    = 10
+
+  def some_method
+    # some code
+  end
+- CamelCase for classes and modules
+  class SomeClass
+    # some code
+  end
+
+  class SomeXML
+    # some code
+  end
+- Use snake_case for naming files, directory
+- SCREAMING_SNAKE_CASE for other constants.
+  SOME_CONST = 5
+-

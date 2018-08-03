@@ -1,0 +1,156 @@
+  Threads
+
+  In case we want to have some of instructions execute at the same time, that is the role of thread. 
+  A call of a simple thread is:
+    a = Thread.new { #instructions }
+  For illustrating the use of thread, I wrote the code below:
+    #!/usr/bin/ruby
+
+    def func1
+       i = 3
+       while i<=5
+          puts "Function 1: #{i}"
+          i = i+1
+          sleep(1)
+       end
+    end
+
+    def func2
+       j = 0
+       while j<=2
+          puts "Function 2: #{j}"
+          j = j+1
+          sleep(1)
+       end
+    end
+
+    t1 = Thread.new{func1()}
+    t2 = Thread.new{func2()}
+    t1.join
+    t2.join
+  The result is:
+    Function 2: 0
+    Function 1: 3
+    Function 2: 1
+    Function 1: 4
+    Function 2: 2
+    Function 1: 5
+  But what if I remove the lines t1.join and t2.join?
+  I had nothing in the console. So the method Thread#join will tell the program to wait for the execution of the threads.
+
+  When we use thread, we have to face a problem that many threads may use the same ressource and they could modify that ressource wrongly.
+   
+    #!/usr/bin/ruby
+    class Item
+            class << self; attr_accessor :price end
+            @price=10
+    end
+
+    def func1
+       price = Item.price
+       price += 10
+       sleep(2)
+       Item.price = price
+    end
+
+    def func2
+       price = Item.price
+       price += 10
+       sleep(1)
+       Item.price = price
+    end
+
+    t1 = Thread.new{func1()}
+    t2 = Thread.new{func2()}
+
+    t1.join
+    t2.join
+
+    puts Item.price
+  The Item.price should be 30, but the result is 20
+  So in this case, we could use an object of Mutex. It serves as an flag, it handle the access of a shared ressource so that all the thread must use it alternatively.
+  
+    #!/usr/bin/ruby
+    class Item
+            class << self; attr_accessor :price end
+            @price=10
+    end
+
+    $mutex = Mutex.new
+    def func1
+       $mutex.synchronize do
+       price = Item.price
+       price += 10
+       sleep(2)
+       Item.price = price
+       end
+    end
+
+    def func2
+       $mutex.synchronize do
+       price = Item.price
+       price += 10
+       sleep(1)
+       Item.price = price
+       end
+    end
+
+    t1 = Thread.new{func1()}
+    t2 = Thread.new{func2()}
+
+    t1.join
+    t2.join
+
+    puts Item.price
+
+  So the result is now : 30
+
+  There is one more problem when we use mutex for the same ressource. If by any reason, a thread using the ressource didn't release the ressource, then other threads will wait the ressource and they wont be executed forever. 
+  That's called "deadlock". 
+    #!/usr/bin/ruby
+    $mutex = Mutex.new
+    n = 5
+    t1 = Thread.new do
+                $mutex.synchronize do
+                        while n < 6 do
+                                puts "deadlock occured"
+                        end
+                        puts "no deadlock now because n= #{n}"
+                end
+        end
+    t2 = Thread.new do
+                sleep(1)
+                $mutex.synchronize do
+                        n += 5
+                        puts "n is incremented now"
+                        cv.signal
+                end
+        end
+
+    t1.join
+    t2.join
+  We confront an infinitie loop because n < 6 (n=5). In this case, n is the same ressource that 2 threads want to use.  
+  Here, we can use an object of ConditionVariable class for avoiding that case.
+     
+    #!/usr/bin/ruby
+    $mutex = Mutex.new
+    n = 5
+    cv = ConditionVariable.new
+    t1 = Thread.new do
+                $mutex.synchronize do
+                        while n < 6 do
+                                puts "deadlock occured"
+                        end
+                        puts "no deadlock now because n= #{n}"
+                end
+        end
+    t2 = Thread.new do
+                $mutex.synchronize do
+                        n += 5
+                        puts "n is incremented now"
+                        cv.signal
+                end
+        end
+
+    t1.join
+    t2.join
